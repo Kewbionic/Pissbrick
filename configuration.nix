@@ -79,8 +79,8 @@
         nvidia.prime = {
             offload.enable = true;
             # Smth about BusIDs
-            intelBusID = "???";
-            nvidiaBusID = "???";
+            intelBusID = "pci@0000:00:02.0";
+            nvidiaBusID = "pci@0000:01:00.0";
         };
     };
 
