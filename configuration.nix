@@ -56,11 +56,11 @@
         vscodium
         obsidian
         pulseaudio
+        wineWowPackages.stableFull
         
         # Proton my beloved
         proton-pass
     ];
-
 
     programs = {
         steam.enable = true;
@@ -87,28 +87,14 @@
     # Enable shit (also still working on this)
     nix.config = {
         allowUnfree = true;
-    }
-
-
-
-
-    # Nvidia drivers and other shit
-        hardware.nvidia.package
-
-        # Don't remember if I needed to change any of this so I'm just gonna comment it all
-
-        #hardware.opengl.driSupport32Bit = false;
-        #hardware.bluetooth.enable = true;
-        #hardware.pulseaudio = {
-        #enable = true;
-    };  
+    };
 
     # Services
     services = {
-        # I think?
-        xserver.videoDrivers = ["nvidia"];
-
-        # Saw it on the nix package shit and figured i'd want this aswell
+        xserver = {
+            videoDrivers = ["nvidia"];
+            snyaptics.enable = true;
+        };
         openssh.enable = true;
     };
 
