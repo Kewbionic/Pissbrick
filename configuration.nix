@@ -83,7 +83,13 @@
     };
 
     fonts = {
-
+        fontconfig.enable = true;
+        # Gives fonts a directory to be held in
+        enableFontDir = true;
+        fonts = with pkgs; [
+            jetbrains-mono
+            google-fonts
+        ];
     };
 
     hardware = { 
