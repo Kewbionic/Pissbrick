@@ -49,6 +49,17 @@
         signal-desktop
         vesktop
 
+        # Notification Manager
+        mako
+
+        # Launcher
+        rofi
+
+        # Proton my beloved
+        proton-pass
+        protonmail-desktop
+        proton-authenticator
+        
         # other
         gimp
         zed-editor
@@ -57,24 +68,27 @@
         obsidian
         pulseaudio
         wineWowPackages.stableFull
-        
-        # Proton my beloved
-        proton-pass
+        nautilus
+        polkit_gnome
     ];
 
     programs = {
         steam.enable = true;
-        fish = enable;
+        fish.enable = true;
+        foot.enable = true;
         spicetify = {
             enable = true;
             #config options
         };
     };
 
+    fonts = {
+
+    };
+
     hardware = { 
         #nvidih (working on this still)
         nvidia.modesetting.enable = true;
-        nvidia.open = true;
 
         nvidia.prime = {
             offload.enable = true;
@@ -89,15 +103,36 @@
         allowUnfree = true;
     };
 
+    environment.systemPackages = with pkgs; [
+        # Gnome extenions whenever I get around to it ( I think )
+    ];
+
     # Services
     services = {
         xserver = {
+            hardware.graphics.enable = true;
             videoDrivers = ["nvidia"];
+            hardware.nvidia.open = true;
             snyaptics.enable = true;
         };
         openssh.enable = true;
+
+        displayManager.gdm.enable = true;
+
+        # Disabled instlling GNOME's suite of apps
+        gnome.core-apps.enable = false;
+        gnome.core-developer-tools = false;
+        gnome.games.enable = false;
+
+        gnome.gnome-keyring.enable = true;
+        dbus.packages = [pkgs.gnome.gnome-keyring pkgs.gcr]
     };
 
+    security = {
+        pam.services.gdm.enableGnomeKeyting = true;
+        # Not too sure about this, because the package name is polkit_gnome and this is just polkit
+        polkit.enable = true;
+    };
 
 
 
