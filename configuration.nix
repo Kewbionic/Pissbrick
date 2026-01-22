@@ -116,16 +116,30 @@
 
     # Services
     services = {
+        pipewire = {
+            enable = true;
+            alsa.enable = true;
+            alsa.support32Bit = true;
+            pulse.enable = true;
+            jack.enable = true;
+
+            wireplumber = {
+                enable = true;
+            };
+        };  
+        
         xserver = {
             videoDrivers = ["nvidia"];
-            synaptics.enable = true;
         };
         openssh.enable = true;
+        libinput.enable = true;
 
         displayManager.gdm.enable = true;
 
         gnome.gnome-keyring.enable = true;
         dbus.packages = [pkgs.gnome.gnome-keyring pkgs.gcr]
+
+
     };
 
     security = {
