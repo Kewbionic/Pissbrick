@@ -16,10 +16,10 @@
 
     # Users (100% unfinished, without a doubt)
     users.users.kewb = {
-        IsNormalUser = true;
+        isNormalUser = true;
         description = "kewbionic";
         home = "/home/kewb";
-        extraGroups = []
+        extraGroups = ["wheel" "audio" "video"];
     };
 
     # Default shell acrosss the system
@@ -92,15 +92,20 @@
         ];
     };
 
-    hardware = { 
+    hardware = {
+        graphics.enable = true;
+        nvidia.open = true;
+        
         #nvidih (working on this still)
-        nvidia.modesetting.enable = true;
+        nvidia = {
+            modesetting.enable = true;
 
-        nvidia.prime = {
-            offload.enable = true;
-            # Smth about BusIDs
-            intelBusID = "pci@0000:00:02.0";
-            nvidiaBusID = "pci@0000:01:00.0";
+            prime = {
+                offload.enable = true;
+                # Smth about BusIDs
+                intelBusId = "pci@0000:00:02.0";
+                nvidiaBusId = "pci@0000:01:00.0";
+            };
         };
     };
 
@@ -109,34 +114,22 @@
         allowUnfree = true;
     };
 
-    environment.systemPackages = with pkgs; [
-        # Gnome extenions whenever I get around to it ( I think )
-    ];
-
     # Services
     services = {
         xserver = {
-            hardware.graphics.enable = true;
             videoDrivers = ["nvidia"];
-            hardware.nvidia.open = true;
-            snyaptics.enable = true;
+            synaptics.enable = true;
         };
         openssh.enable = true;
 
         displayManager.gdm.enable = true;
-
-        # Disabled instlling GNOME's suite of apps
-        gnome.core-apps.enable = false;
-        gnome.core-developer-tools = false;
-        gnome.games.enable = false;
 
         gnome.gnome-keyring.enable = true;
         dbus.packages = [pkgs.gnome.gnome-keyring pkgs.gcr]
     };
 
     security = {
-        pam.services.gdm.enableGnomeKeyting = true;
-        # Not too sure about this, because the package name is polkit_gnome and this is just polkit
+        pam.services.gdm.enableGnomeKeyring = true;
         polkit.enable = true;
     };
 
@@ -189,5 +182,4 @@
 
 
 
-
-};
+}
