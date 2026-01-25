@@ -10,7 +10,12 @@
   # Boot configuration
   boot = {
     loader = {
-      systemd-boot.enable = true;
+      systemd-boot = {
+        enable = true;
+        consoleMode = "max";
+        editor = true;
+      };
+
       efi.canTouchEfiVariables = true;
     };
   };
@@ -21,7 +26,7 @@
     users.kewb = {
       isNormalUser = true;
       description = "kewbionic";
-      home = "/home/kewb";
+      # home = "/home/kewb";
       extraGroups = [
         "wheel"
         "audio"
@@ -44,15 +49,22 @@
       auto-optimise-store = true;
       use-xdg-base-directories = true;
     };
-  };
 
-  system.stateVersion = "25.11"; # Make sure this matches your desired version
+    gc = {
+      automatic = true;
+      dates = "weekly";
+      persistent = true;
+      options = "--delete-older-than 3d";
+    };
+  };
 
   # Networking configuration
   networking = {
-    firewall.enable = true;
-    firewall.allowedTCPPorts = [ ];
-    firewall.allowedUDPPorts = [ ];
+    firewall = {
+      enable = true;
+      allowedTCPPorts = [ ];
+      allowedUDPPorts = [ ];
+    };
     hostName = "pissbrick";
     networkmanager.enable = true;
   };
@@ -63,17 +75,18 @@
   # Internationalization settings
   i18n = {
     defaultLocale = "en_US.UTF-8";
-    extraLocaleSettings = {
-      LC_ADDRESS = "en_US.UTF-8";
-      LC_IDENTIFICATION = "en_US.UTF-8";
-      LC_MEASUREMENT = "en_US.UTF-8";
-      LC_MONETARY = "en_US.UTF-8";
-      LC_NAME = "en_US.UTF-8";
-      LC_NUMERIC = "en_US.UTF-8";
-      LC_PAPER = "en_US.UTF-8";
-      LC_TELEPHONE = "en_US.UTF-8";
-      LC_TIME = "en_US.UTF-8";
-    };
+    # TODO You dont need to specify the ones under this, since they will use the default locale
+    # extraLocaleSettings = {
+    #   LC_ADDRESS = "en_US.UTF-8";
+    #   LC_IDENTIFICATION = "en_US.UTF-8";
+    #   LC_MEASUREMENT = "en_US.UTF-8";
+    #   LC_MONETARY = "en_US.UTF-8";
+    #   LC_NAME = "en_US.UTF-8";
+    #   LC_NUMERIC = "en_US.UTF-8";
+    #   LC_PAPER = "en_US.UTF-8";
+    #   LC_TELEPHONE = "en_US.UTF-8";
+    #   LC_TIME = "en_US.UTF-8";
+    # };
   };
 
   # Packages
@@ -101,14 +114,26 @@
     lmms
     vscodium
     obsidian
-    pulseaudio
-    wineWowPackages.stableFull
     nautilus
-    polkit_gnome
+
+    # CLI tools
+    wineWow64Packages.stagingFull
     nh
     fd # Fast "find" command alternative
+    btop-cuda # CLI Task manager
+    gdu # filesize usage CLI tool
+    bat # Nicer "cat" alternative
+    dysk # Diskusage CLI tool
+    fastfetch # system information
+
+    # Deps
+    polkit_gnome
     gnome-keyring
     gcr # Added for compatibility with gnome-keyring packages
+
+    # Theming (mostly for nautilus and other gnome apps)
+    adwaita-icon-theme
+    adw-gtk3
   ];
 
   # Programs configuration
@@ -116,6 +141,13 @@
     steam.enable = true;
     fish.enable = true;
     foot.enable = true;
+
+    hyprland = {
+      enable = true;
+      withUWSM = true;
+      xwayland.enable = true;
+    };
+
     # spicetify.enable = true;
   };
 
@@ -132,6 +164,7 @@
   # Hardware configuration
   hardware = {
     graphics.enable = true;
+
     nvidia = {
       open = true;
       modesetting.enable = true;
@@ -154,8 +187,9 @@
       wireplumber.enable = true;
     };
 
+    displayManager.gdm.enable = true;
+
     xserver = {
-      displayManager.gdm.enable = true;
       videoDrivers = [ "nvidia" ];
       xkb = {
         layout = "us";
@@ -163,8 +197,11 @@
       };
     };
 
+    tetrd.enable = true;
+
     openssh.enable = true;
     libinput.enable = true;
+
     dbus.packages = [
       pkgs.gnome-keyring
       pkgs.gcr
@@ -178,4 +215,9 @@
       login.enableGnomeKeyring = true; # Ensures keyring unlocks on login
     };
   };
+
+  # This option defines the first version of NixOS you installed on this machine.
+  # This is used for compatibility.
+  # Do NOT change this after installing.
+  system.stateVersion = "25.11";
 }
