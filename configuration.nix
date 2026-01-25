@@ -1,39 +1,71 @@
-{Config, pkgs, ...}:
+{ config, pkgs, ... }:
 
 {
-    #Imports
+    # Imports
     imports = [
-        # put hardware shit here once I get onto Nix & whatever else is needed
-        spicetify-nix.homeManagerModules.spicetify
+        ./hardware-configuration.nix
+        # spicetify-nix.homeManagerModules.spicetify
     ];
 
+    # Boot configuration
     boot = {
-        # still working on this, pain in my ass because I'm stoopid, not even sure this is correct either :sob:
-        efi.canTouchEfiVariables = true;
-
-        # Gonna have to get help for the pipewire shit
-    };
-
-    # Users (100% unfinished, without a doubt)
-    users.users.kewb = {
-        isNormalUser = true;
-        description = "kewbionic";
-        home = "/home/kewb";
-        extraGroups = ["wheel" "audio" "video"];
-    };
-
-    # Default shell acrosss the system
-    environment.defaultShell = pkgs.fish;
-
-
-    networking = {
-        firewall = {
-            enable = true;
-            allowedTCPPorts = [];
-            allowedUDPPorts = [];
+        loader = {
+            systemd-boot.enable = true;
+            efi.canTouchEfiVariables = true;
         };
+    };
+
+    # Users configuration
+    users = {
+        defaultUserShell = pkgs.fish;  # Global default shell
+        users.kewb = {
+            isNormalUser = true;
+            description = "kewbionic";
+            home = "/home/kewb";
+            extraGroups = [ "wheel" "audio" "video" "networkmanager" ];
+        };
+    };
+
+    # Nix settings
+    nixpkgs.config.allowUnfree = true;
+
+    nix = {
+        settings = {
+            experimental-features = [ "nix-command" "flakes" ];
+            trusted-users = [ "@wheel" ];
+            auto-optimise-store = true;
+            use-xdg-base-directories = true;
+        };
+    };
+
+    system.stateVersion = "25.11";  # Make sure this matches your desired version
+
+    # Networking configuration
+    networking = {
+        firewall.enable = true;
+        firewall.allowedTCPPorts = [];
+        firewall.allowedUDPPorts = [];
         hostName = "pissbrick";
         networkmanager.enable = true;
+    };
+
+    # Time settings
+    time.timeZone = "America/New_York";
+
+    # Internationalization settings
+    i18n = {
+        defaultLocale = "en_US.UTF-8";
+        extraLocaleSettings = {
+            LC_ADDRESS = "en_US.UTF-8";
+            LC_IDENTIFICATION = "en_US.UTF-8";
+            LC_MEASUREMENT = "en_US.UTF-8";
+            LC_MONETARY = "en_US.UTF-8";
+            LC_NAME = "en_US.UTF-8";
+            LC_NUMERIC = "en_US.UTF-8";
+            LC_PAPER = "en_US.UTF-8";
+            LC_TELEPHONE = "en_US.UTF-8";
+            LC_TIME = "en_US.UTF-8";
+        };
     };
 
     # Packages
@@ -41,26 +73,21 @@
         # Games
         modrinth-app
         heroic
-        
+
         # Media
         vlc
         
         # Social
         signal-desktop
         vesktop
-
+        
         # Notification Manager
         mako
-
+        
         # Launcher
         rofi
-
-        # Proton my beloved
-        proton-pass
-        protonmail-desktop
-        proton-authenticator
         
-        # other
+        # Other
         gimp
         zed-editor
         lmms
@@ -70,51 +97,45 @@
         wineWowPackages.stableFull
         nautilus
         polkit_gnome
+        nh
+        fd  # Fast "find" command alternative
+        gnome-keyring
+        gcr  # Added for compatibility with gnome-keyring packages
     ];
 
+    # Programs configuration
     programs = {
         steam.enable = true;
         fish.enable = true;
         foot.enable = true;
-        spicetify = {
-            enable = true;
-            #config options
-        };
+        # spicetify.enable = true;
     };
 
+    # Fonts configuration
     fonts = {
         fontconfig.enable = true;
-        # Gives fonts a directory to be held in
-        enableFontDir = true;
-        fonts = with pkgs; [
+        fontDir.enable = true;
+        packages = with pkgs; [
             jetbrains-mono
             google-fonts
         ];
     };
 
+    # Hardware configuration
     hardware = {
         graphics.enable = true;
-        nvidia.open = true;
-        
-        #nvidih (working on this still)
         nvidia = {
+            open = true;
             modesetting.enable = true;
-
             prime = {
                 offload.enable = true;
-                # Smth about BusIDs
-                intelBusId = "pci@0000:00:02.0";
-                nvidiaBusId = "pci@0000:01:00.0";
+                intelBusId = "PCI:0:2:0";
+                nvidiaBusId = "PCI:1:0:0";
             };
         };
     };
 
-    # Enable shit (also still working on this)
-    nix.config = {
-        allowUnfree = true;
-    };
-
-    # Services
+    # Services configuration
     services = {
         pipewire = {
             enable = true;
@@ -122,78 +143,28 @@
             alsa.support32Bit = true;
             pulse.enable = true;
             jack.enable = true;
-
-            wireplumber = {
-                enable = true;
-            };
-        };  
-        
-        xserver = {
-            videoDrivers = ["nvidia"];
+            wireplumber.enable = true;
         };
+
+        xserver = {
+            displayManager.gdm.enable = true;
+            videoDrivers = [ "nvidia" ];
+            xkb = {
+                layout = "us";
+                variant = "";
+            };
+        };
+
         openssh.enable = true;
         libinput.enable = true;
-
-        displayManager.gdm.enable = true;
-
-        gnome.gnome-keyring.enable = true;
-        dbus.packages = [pkgs.gnome.gnome-keyring pkgs.gcr]
-
-
+        dbus.packages = [ pkgs.gnome-keyring pkgs.gcr ];
     };
 
+    # Security settings
     security = {
-        pam.services.gdm.enableGnomeKeyring = true;
-        polkit.enable = true;
+        pam.services = {
+            gdm.enableGnomeKeyring = true;   # Updated for gnome-keyring
+            login.enableGnomeKeyring = true;  # Ensures keyring unlocks on login
+        };
     };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
