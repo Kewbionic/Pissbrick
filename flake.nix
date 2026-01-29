@@ -31,6 +31,13 @@
                 tetrd = tetrd-pkgs.tetrd;
               })
             ];
+
+            # replace tetrd module
+            disabledModules = [ "services/networking/tetrd.nix" ];
+            
+            imports = [
+              "${inputs.nixpkgs-tetrd}/nixos/modules/services/networking/tetrd.nix"
+            ];
           }
 
           # your system configs...
